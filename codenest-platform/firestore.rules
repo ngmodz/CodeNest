@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Questions are readable by authenticated users
+    match /questions/{questionId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null; // For AI-generated questions
+    }
+    
+    // Submissions are readable/writable by the user who created them
+    match /submissions/{submissionId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.uid;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.uid;
+    }
+    
+    // Daily challenges are readable by authenticated users
+    match /daily_challenges/{challengeId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null; // For system-generated challenges
+    }
+    
+    // Topics are readable by authenticated users
+    match /topics/{topicId} {
+      allow read: if request.auth != null;
+    }
+  }
+}
