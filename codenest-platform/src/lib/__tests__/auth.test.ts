@@ -34,7 +34,7 @@ describe('authService', () => {
   describe('signIn', () => {
     it('should sign in user with email and password', async () => {
       const mockUserCredential = { user: mockUser };
-      mockSignInWithEmailAndPassword.mockResolvedValue(mockUserCredential as any);
+      mockSignInWithEmailAndPassword.mockResolvedValue(mockUserCredential as never);
 
       const result = await authService.signIn('test@example.com', 'password123');
 
@@ -62,7 +62,7 @@ describe('authService', () => {
   describe('signUp', () => {
     it('should create new user with email and password', async () => {
       const mockUserCredential = { user: mockUser };
-      mockCreateUserWithEmailAndPassword.mockResolvedValue(mockUserCredential as any);
+      mockCreateUserWithEmailAndPassword.mockResolvedValue(mockUserCredential as never);
 
       const result = await authService.signUp('test@example.com', 'password123');
 
@@ -90,7 +90,7 @@ describe('authService', () => {
   describe('signInWithGoogle', () => {
     it('should sign in user with Google', async () => {
       const mockUserCredential = { user: mockUser };
-      mockSignInWithPopup.mockResolvedValue(mockUserCredential as any);
+      mockSignInWithPopup.mockResolvedValue(mockUserCredential as never);
 
       const result = await authService.signInWithGoogle();
 
@@ -133,9 +133,10 @@ describe('authService', () => {
 
   describe('getCurrentUser', () => {
     it('should return current user when authenticated', () => {
-      // Mock auth.currentUser
-      const mockAuth = { currentUser: mockUser };
-      jest.doMock('../firebase', () => ({ auth: mockAuth }));
+      // Mock auth.currentUser directly
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mockAuth = require('../firebase');
+      mockAuth.auth.currentUser = mockUser;
 
       const result = authService.getCurrentUser();
 
@@ -148,8 +149,9 @@ describe('authService', () => {
     });
 
     it('should return null when not authenticated', () => {
-      const mockAuth = { currentUser: null };
-      jest.doMock('../firebase', () => ({ auth: mockAuth }));
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mockAuth = require('../firebase');
+      mockAuth.auth.currentUser = null;
 
       const result = authService.getCurrentUser();
 
@@ -163,7 +165,7 @@ describe('authService', () => {
       const mockUnsubscribe = jest.fn();
       
       mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any);
+        callback(mockUser as never);
         return mockUnsubscribe;
       });
 

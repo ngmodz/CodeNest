@@ -48,9 +48,7 @@ describe('AuthContext', () => {
   });
 
   it('should provide initial loading state', () => {
-    let authStateCallback: (user: any) => void;
-    mockAuthService.onAuthStateChange.mockImplementation((callback) => {
-      authStateCallback = callback;
+    mockAuthService.onAuthStateChange.mockImplementation(() => {
       return jest.fn();
     });
 
@@ -64,9 +62,7 @@ describe('AuthContext', () => {
   });
 
   it('should provide user when authenticated', async () => {
-    let authStateCallback: (user: any) => void;
     mockAuthService.onAuthStateChange.mockImplementation((callback) => {
-      authStateCallback = callback;
       setTimeout(() => callback(mockUser), 0);
       return jest.fn();
     });
@@ -83,9 +79,7 @@ describe('AuthContext', () => {
   });
 
   it('should provide null user when not authenticated', async () => {
-    let authStateCallback: (user: any) => void;
     mockAuthService.onAuthStateChange.mockImplementation((callback) => {
-      authStateCallback = callback;
       setTimeout(() => callback(null), 0);
       return jest.fn();
     });

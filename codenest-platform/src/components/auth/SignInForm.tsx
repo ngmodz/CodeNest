@@ -23,8 +23,8 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
     try {
       await signIn(email, password);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign in');
     } finally {
       setIsLoading(false);
     }
@@ -37,8 +37,8 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
     try {
       await signInWithGoogle();
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign in with Google');
     } finally {
       setIsLoading(false);
     }
@@ -137,7 +137,7 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
         {onSwitchToSignUp && (
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button
                 onClick={onSwitchToSignUp}
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"

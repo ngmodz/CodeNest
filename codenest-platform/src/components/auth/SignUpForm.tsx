@@ -35,8 +35,8 @@ export function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
     try {
       await signUp(email, password);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to create account');
     } finally {
       setIsLoading(false);
     }
@@ -49,8 +49,8 @@ export function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
     try {
       await signInWithGoogle();
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up with Google');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign up with Google');
     } finally {
       setIsLoading(false);
     }
