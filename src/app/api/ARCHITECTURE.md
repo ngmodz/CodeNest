@@ -15,7 +15,7 @@ graph TB
     
     subgraph "API Layer (Next.js App Router)"
         C --> D[/api/compile]
-        C --> E[/api/gemini]
+        C --> E[/api/generateQuestion]
         C --> F[/api/streak]
         
         D --> G[Auth Middleware]
@@ -29,7 +29,7 @@ graph TB
     
     subgraph "External Services"
         D --> K[Judge0 API]
-        E --> L[Google Gemini AI]
+        E --> L[OpenRouter AI]
     end
     
     subgraph "Firebase Backend"
@@ -64,7 +64,7 @@ src/app/api/
 │   ├── route.ts         # Code compilation endpoint
 │   └── __tests__/
 │       └── route.test.ts
-├── gemini/
+├── generateQuestion/
 │   ├── route.ts         # AI question generation
 │   └── __tests__/
 │       └── route.test.ts
@@ -244,24 +244,24 @@ export const POST = withAuth(async (request: AuthenticatedRequest): Promise<Next
 });
 ```
 
-### 2. AI Question Generation API (`/api/gemini`)
+### 2. AI Question Generation API (`/api/generateQuestion`)
 
 #### Purpose
-Generate personalized coding questions using Google Gemini AI based on user skill level and topic preferences.
+Generate personalized coding questions using OpenRouter AI (DeepSeek Coder / Qwen models) based on user skill level and topic preferences.
 
 #### Architecture
 ```mermaid
 sequenceDiagram
     participant Client
     participant API
-    participant Gemini
+    participant OpenRouter
     participant Validation
-    
-    Client->>API: POST /api/gemini
+
+    Client->>API: POST /api/generateQuestion
     API->>API: Authenticate & validate
     API->>API: Generate context-aware prompt
-    API->>Gemini: Request question generation
-    Gemini->>API: Return generated question
+    API->>OpenRouter: Request question generation
+    OpenRouter->>API: Return generated question
     API->>Validation: Validate question structure
     Validation->>API: Validated question data
     API->>Client: Formatted question response

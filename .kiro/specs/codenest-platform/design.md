@@ -172,7 +172,7 @@ interface Judge0Service {
 
 #### AI Question Generation
 ```typescript
-interface GeminiService {
+interface OpenRouterService {
   generateProblem(prompt: {
     level: string
     topic: string

@@ -113,7 +113,7 @@ async function handleCompile(request: AuthenticatedRequest): Promise<NextRespons
       return createErrorResponse(validation.error!, 400);
     }
 
-    const { code, language, testCases, action } = sanitizeInput(validation.data!);
+    const { code, language, testCases, action } = sanitizeInput(validation.data!) as CompileRequest;
 
     // Validate language
     if (!(language in LANGUAGE_MAP)) {
@@ -130,7 +130,7 @@ async function handleCompile(request: AuthenticatedRequest): Promise<NextRespons
 
     // Filter test cases based on action
     const relevantTestCases = action === 'run' 
-      ? testCases.filter(tc => !tc.isHidden)
+      ? testCases.filter((tc: { input: string; expectedOutput: string; isHidden?: boolean }) => !tc.isHidden)
       : testCases;
 
     if (relevantTestCases.length === 0) {

@@ -29,10 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     uid: 'mock-user-123',
     email: 'developer@codenest.dev',
     displayName: 'Developer User',
-    emailVerified: true,
-    photoURL: null,
-    createdAt: new Date().toISOString(),
-    lastLoginAt: new Date().toISOString(),
+    photoURL: undefined,
   };
 
   useEffect(() => {

@@ -84,7 +84,7 @@ CodeNest is a full-stack online coding platform designed to help users practice 
 #### Acceptance Criteria
 
 1. WHEN storing data THEN the system SHALL use Firestore collections for users, questions, submissions, daily_challenges, and topics
-2. WHEN generating questions THEN the system SHALL execute generateQuestion() Firebase Function to call Google Gemini
+2. WHEN generating questions THEN the system SHALL execute generateQuestion() API route to call OpenRouter AI
 3. WHEN evaluating code THEN the system SHALL execute evaluateCode() Firebase Function to interface with Judge0
 4. WHEN updating streaks THEN the system SHALL execute updateStreak() Firebase Function with time validation
 5. WHEN handling requests THEN the system SHALL implement proper authentication and authorization for all functions

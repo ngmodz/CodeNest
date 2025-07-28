@@ -57,14 +57,17 @@ export default function ProfileManager({ initialProfile, onProfileUpdate }: Prof
     setError(null);
 
     try {
-      const userProfile = await userService.getProfile(user.uid);
-      if (userProfile) {
+      const result = await userService.getProfile(user.uid);
+      if (result.success && result.data) {
+        const userProfile = result.data;
         setProfile(userProfile);
         setFormData({
           level: userProfile.level,
           preferredLanguage: userProfile.preferredLanguage,
           theme: userProfile.theme
         });
+      } else {
+        setError(result.error?.message || 'Failed to load profile');
       }
     } catch (err) {
       console.error('Error loading profile:', err);

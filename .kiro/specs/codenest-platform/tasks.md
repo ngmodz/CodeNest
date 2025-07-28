@@ -129,11 +129,11 @@
     - Create test cases for code evaluation scenarios
     - _Requirements: 5.1, 5.2, 7.3_
 
-  - [x] 6.2 Build `/api/gemini` endpoint for AI question generation
+  - [x] 6.2 Build `/api/generateQuestion` endpoint for AI question generation
 
 
 
-    - Create API route for Google Gemini AI integration
+    - Create API route for OpenRouter AI integration (DeepSeek Coder / Qwen Code models)
     - Accept POST requests with user level and selected topic
     - Generate dynamic prompts based on user's current skill level
     - Return formatted coding questions with title, description, constraints
@@ -217,7 +217,7 @@
     - _Requirements: 5.2, 5.3, 5.4_
 
 - [ ] 9. Implement AI question generation and daily challenges
-  - [ ] 9.1 Create AI question generation interface
+  - [x] 9.1 Create AI question generation interface
     - Build admin interface for triggering AI question generation
     - Implement question preview and editing capabilities
     - Add question validation and quality checks
@@ -225,7 +225,18 @@
     - Write tests for question generation workflow
     - _Requirements: 3.2, 3.3, 3.4_
 
-  - [ ] 9.2 Build daily challenge system
+  - [x] 9.2 Implement AI Question Generation Using OpenRouter (DeepSeek / Qwen Model)
+    - Set up OpenRouter.ai API integration with DeepSeek Coder or Qwen Code models
+    - Create `/api/generateQuestion.ts` endpoint accepting level and topic parameters
+    - Implement secure API key management via `.env.local` environment variables
+    - Build dynamic prompt construction for coding question generation
+    - Add proper request/response handling with OpenRouter API format
+    - Implement question parsing and validation for title, description, and test cases
+    - Create error handling and fallback mechanisms for API failures
+    - Write comprehensive tests for AI question generation workflow
+    - _Requirements: 3.1, 3.2, 7.2_
+
+  - [ ] 9.3 Build daily challenge system
     - Create daily challenge generation and assignment logic
     - Implement challenge difficulty matching to user levels
     - Add challenge completion tracking and rewards

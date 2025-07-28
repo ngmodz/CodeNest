@@ -16,8 +16,8 @@ interface Topic {
 
 interface TopicFilterProps {
   className?: string;
-  onTopicSelect?: (topic: Topic) => void;
-  onDifficultySelect?: (difficulty: DifficultyLevel) => void;
+  onTopicSelect?: (topic: Topic | null) => void;
+  onDifficultySelect?: (difficulty: DifficultyLevel | null) => void;
 }
 
 export function TopicFilter({ 

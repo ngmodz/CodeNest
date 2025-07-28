@@ -181,8 +181,8 @@ export function handleExternalServiceError(serviceName: string, error: any): nev
       code = ErrorCodes.JUDGE0_ERROR;
       message = 'Code execution service is currently unavailable';
       break;
-    case 'gemini':
-      code = ErrorCodes.GEMINI_ERROR;
+    case 'openrouter':
+      code = ErrorCodes.GEMINI_ERROR; // Keep the same error code for compatibility
       message = 'AI service is currently unavailable';
       break;
     default:
@@ -245,7 +245,7 @@ export async function withRetry<T>(
 }
 
 export function logError(error: Error | AppError, context?: Record<string, any>): void {
-  const errorInfo = {
+  const errorInfo: Record<string, any> = {
     name: error.name,
     message: error.message,
     stack: error.stack,
@@ -254,9 +254,9 @@ export function logError(error: Error | AppError, context?: Record<string, any>)
   };
 
   if (error instanceof AppError) {
-    errorInfo['code'] = error.code;
-    errorInfo['statusCode'] = error.statusCode;
-    errorInfo['details'] = error.details;
+    errorInfo.code = error.code;
+    errorInfo.statusCode = error.statusCode;
+    errorInfo.details = error.details;
   }
 
   console.error('Application Error:', JSON.stringify(errorInfo, null, 2));

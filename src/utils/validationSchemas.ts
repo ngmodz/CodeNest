@@ -116,21 +116,21 @@ export class UserProfileValidationSchema implements ValidationSchema<UserProfile
 
     // Validate level
     if (data.level !== undefined) {
-      if (!data.level || !SKILL_LEVELS.includes(data.level)) {
+      if (!data.level || !SKILL_LEVELS.includes(data.level as any)) {
         errors.push(ValidationUtils.createValidationError('level', `Skill level must be one of: ${SKILL_LEVELS.join(', ')}`));
       }
     }
 
     // Validate preferredLanguage
     if (data.preferredLanguage !== undefined) {
-      if (!data.preferredLanguage || !PROGRAMMING_LANGUAGES.includes(data.preferredLanguage)) {
+      if (!data.preferredLanguage || !PROGRAMMING_LANGUAGES.includes(data.preferredLanguage as any)) {
         errors.push(ValidationUtils.createValidationError('preferredLanguage', `Preferred language must be one of: ${PROGRAMMING_LANGUAGES.join(', ')}`));
       }
     }
 
     // Validate theme
     if (data.theme !== undefined) {
-      if (!data.theme || !THEMES.includes(data.theme)) {
+      if (!data.theme || !THEMES.includes(data.theme as any)) {
         errors.push(ValidationUtils.createValidationError('theme', `Theme must be one of: ${THEMES.join(', ')}`));
       }
     }
@@ -176,7 +176,7 @@ export class UserProfileValidationSchema implements ValidationSchema<UserProfile
   }
 
   validateComplete(data: Omit<UserProfile, 'uid'>): ValidationResult {
-    const requiredFields: (keyof UserProfile)[] = ['level', 'preferredLanguage', 'theme', 'streak', 'lastActiveDate', 'totalXP', 'solvedProblems'];
+    const requiredFields: (keyof Omit<UserProfile, 'uid'>)[] = ['level', 'preferredLanguage', 'theme', 'streak', 'lastActiveDate', 'totalXP', 'solvedProblems'];
     const errors: ValidationError[] = [];
 
     // Check for required fields
@@ -203,15 +203,15 @@ export class UserProfileValidationSchema implements ValidationSchema<UserProfile
       if (sanitizedUid) sanitized.uid = sanitizedUid;
     }
 
-    if (data.level && SKILL_LEVELS.includes(data.level)) {
+    if (data.level && SKILL_LEVELS.includes(data.level as any)) {
       sanitized.level = data.level;
     }
 
-    if (data.preferredLanguage && PROGRAMMING_LANGUAGES.includes(data.preferredLanguage)) {
+    if (data.preferredLanguage && PROGRAMMING_LANGUAGES.includes(data.preferredLanguage as any)) {
       sanitized.preferredLanguage = data.preferredLanguage;
     }
 
-    if (data.theme && THEMES.includes(data.theme)) {
+    if (data.theme && THEMES.includes(data.theme as any)) {
       sanitized.theme = data.theme;
     }
 
@@ -263,7 +263,7 @@ export class QuestionValidationSchema implements ValidationSchema<QuestionDocume
 
     // Validate difficulty
     if (data.difficulty !== undefined) {
-      if (!data.difficulty || !DIFFICULTY_LEVELS.includes(data.difficulty)) {
+      if (!data.difficulty || !DIFFICULTY_LEVELS.includes(data.difficulty as any)) {
         errors.push(ValidationUtils.createValidationError('difficulty', `Difficulty must be one of: ${DIFFICULTY_LEVELS.join(', ')}`));
       }
     }
@@ -359,7 +359,7 @@ export class QuestionValidationSchema implements ValidationSchema<QuestionDocume
   }
 
   validateComplete(data: Omit<QuestionDocument, 'id' | 'createdAt'>): ValidationResult {
-    const requiredFields: (keyof QuestionDocument)[] = ['title', 'description', 'difficulty', 'topic', 'examples', 'constraints', 'testCases', 'isAI', 'tags'];
+    const requiredFields: (keyof Omit<QuestionDocument, 'id' | 'createdAt'>)[] = ['title', 'description', 'difficulty', 'topic', 'examples', 'constraints', 'testCases', 'isAI', 'tags'];
     const errors: ValidationError[] = [];
 
     // Check for required fields
@@ -387,7 +387,7 @@ export class QuestionValidationSchema implements ValidationSchema<QuestionDocume
     const sanitizedDescription = ValidationUtils.sanitizeString(data.description, { maxLength: 5000 });
     if (sanitizedDescription) sanitized.description = sanitizedDescription;
 
-    if (data.difficulty && DIFFICULTY_LEVELS.includes(data.difficulty)) {
+    if (data.difficulty && DIFFICULTY_LEVELS.includes(data.difficulty as any)) {
       sanitized.difficulty = data.difficulty;
     }
 
@@ -400,7 +400,7 @@ export class QuestionValidationSchema implements ValidationSchema<QuestionDocume
         .map(example => ({
           input: ValidationUtils.sanitizeString(example.input) || '',
           output: ValidationUtils.sanitizeString(example.output) || '',
-          explanation: example.explanation ? ValidationUtils.sanitizeString(example.explanation) : undefined
+          explanation: example.explanation ? ValidationUtils.sanitizeString(example.explanation) || undefined : undefined
         }));
     }
 
@@ -473,14 +473,14 @@ export class SubmissionValidationSchema implements ValidationSchema<SubmissionDo
 
     // Validate language
     if (data.language !== undefined) {
-      if (!data.language || !PROGRAMMING_LANGUAGES.includes(data.language)) {
+      if (!data.language || !PROGRAMMING_LANGUAGES.includes(data.language as any)) {
         errors.push(ValidationUtils.createValidationError('language', `Programming language must be one of: ${PROGRAMMING_LANGUAGES.join(', ')}`));
       }
     }
 
     // Validate status
     if (data.status !== undefined) {
-      if (!data.status || !SUBMISSION_STATUSES.includes(data.status)) {
+      if (!data.status || !SUBMISSION_STATUSES.includes(data.status as any)) {
         errors.push(ValidationUtils.createValidationError('status', `Status must be one of: ${SUBMISSION_STATUSES.join(', ')}`));
       }
     }
@@ -536,7 +536,7 @@ export class SubmissionValidationSchema implements ValidationSchema<SubmissionDo
   }
 
   validateComplete(data: Omit<SubmissionDocument, 'id' | 'submittedAt'>): ValidationResult {
-    const requiredFields: (keyof SubmissionDocument)[] = ['uid', 'problemId', 'code', 'language', 'status', 'testResults'];
+    const requiredFields: (keyof Omit<SubmissionDocument, 'id' | 'submittedAt'>)[] = ['uid', 'problemId', 'code', 'language', 'status', 'testResults'];
     const errors: ValidationError[] = [];
 
     // Check for required fields
@@ -569,11 +569,11 @@ export class SubmissionValidationSchema implements ValidationSchema<SubmissionDo
       sanitized.code = data.code;
     }
 
-    if (data.language && PROGRAMMING_LANGUAGES.includes(data.language)) {
+    if (data.language && PROGRAMMING_LANGUAGES.includes(data.language as any)) {
       sanitized.language = data.language;
     }
 
-    if (data.status && SUBMISSION_STATUSES.includes(data.status)) {
+    if (data.status && SUBMISSION_STATUSES.includes(data.status as any)) {
       sanitized.status = data.status;
     }
 

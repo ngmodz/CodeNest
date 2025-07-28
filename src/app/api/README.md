@@ -14,7 +14,7 @@ The CodeNest API is built using Next.js App Router with a focus on security, sca
 
 ### Current API Routes (3/12 used)
 1. `/api/compile` - Code compilation and execution
-2. `/api/gemini` - AI question generation
+2. `/api/generateQuestion` - AI question generation using OpenRouter
 3. `/api/streak` - Streak and XP management
 
 ## Authentication
@@ -99,9 +99,9 @@ Execute code against test cases using Judge0.
 
 ---
 
-### 2. AI Question Generation - `/api/gemini`
+### 2. AI Question Generation - `/api/generateQuestion`
 
-Generate coding questions using Google Gemini AI.
+Generate coding questions using OpenRouter AI (DeepSeek Coder / Qwen models).
 
 **Method**: `POST`
 
@@ -306,8 +306,8 @@ JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
 JUDGE0_API_KEY=your-rapidapi-key
 JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
 
-# Google Gemini AI
-GEMINI_API_KEY=your-gemini-api-key
+# OpenRouter AI
+OPENROUTER_API_KEY=your-openrouter-api-key
 ```
 
 ---
@@ -343,7 +343,7 @@ npm test -- --testPathPattern=api
 
 # Run specific endpoint tests
 npm test -- src/app/api/compile/__tests__
-npm test -- src/app/api/gemini/__tests__
+npm test -- src/app/api/generateQuestion/__tests__
 npm test -- src/app/api/streak/__tests__
 ```
 

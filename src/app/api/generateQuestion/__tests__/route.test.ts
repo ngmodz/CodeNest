@@ -14,55 +14,32 @@ jest.mock('firebase-admin/auth', () => ({
   })),
 }));
 
-// Mock Google Generative AI
-jest.mock('@google/generative-ai', () => ({
-  GoogleGenerativeAI: jest.fn().mockImplementation(() => ({
-    getGenerativeModel: jest.fn(() => ({
-      generateContent: jest.fn(),
-    })),
-  })),
-}));
+// Mock fetch for OpenRouter API
+global.fetch = jest.fn();
 
-describe('/api/gemini', () => {
-  let mockGenerateContent: jest.Mock;
+describe('/api/generateQuestion', () => {
+  let mockFetch: jest.MockedFunction<typeof fetch>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const mockGenAI = new GoogleGenerativeAI();
-    const mockModel = mockGenAI.getGenerativeModel();
-    mockGenerateContent = mockModel.generateContent;
-    
-    process.env.GEMINI_API_KEY = 'test-key';
+    mockFetch = fetch as jest.MockedFunction<typeof fetch>;
+    process.env.OPENROUTER_API_KEY = 'test-key';
   });
-
-  const createRequest = (body: any, token = 'valid-token') => {
-    return new NextRequest('http://localhost:3000/api/gemini', {
-      method: 'POST',
-      headers: {
-        'authorization': `Bearer ${token}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-  };
 
   const mockValidQuestion = {
     title: 'Two Sum',
-    description: 'Given an array of integers, return indices of two numbers that add up to target.',
-    difficulty: 'Basic',
-    topic: 'Lists',
+    description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.',
     examples: [
       {
-        input: '[2,7,11,15], target = 9',
+        input: '[2,7,11,15]\n9',
         output: '[0,1]',
-        explanation: '2 + 7 = 9'
+        explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].'
       }
     ],
     constraints: [
       '2 <= nums.length <= 10^4',
-      '-10^9 <= nums[i] <= 10^9'
+      '-10^9 <= nums[i] <= 10^9',
+      '-10^9 <= target <= 10^9'
     ],
     testCases: [
       {
@@ -76,16 +53,38 @@ describe('/api/gemini', () => {
         isHidden: true
       }
     ],
-    hints: [
-      'Use a hash map to store values and indices',
-      'Look for complement of current number'
-    ],
-    timeComplexity: 'O(n)',
-    spaceComplexity: 'O(n)'
+    difficulty: 'Beginner',
+    tags: ['Lists', 'Hash Table']
+  };
+
+  const createRequest = (body: any, token = 'valid-token') => {
+    return new NextRequest('http://localhost:3000/api/generateQuestion', {
+      method: 'POST',
+      headers: {
+        'authorization': `Bearer ${token}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+  };
+
+  const mockSuccessfulOpenRouterResponse = () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify(mockValidQuestion)
+            }
+          }
+        ]
+      })
+    } as Response);
   };
 
   it('should reject requests without authorization header', async () => {
-    const request = new NextRequest('http://localhost:3000/api/gemini', {
+    const request = new NextRequest('http://localhost:3000/api/generateQuestion', {
       method: 'POST',
       body: JSON.stringify({}),
     });
@@ -120,11 +119,7 @@ describe('/api/gemini', () => {
   });
 
   it('should successfully generate a question', async () => {
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => JSON.stringify(mockValidQuestion),
-      },
-    });
+    mockSuccessfulOpenRouterResponse();
 
     const request = createRequest({
       userLevel: 'Beginner',
@@ -146,32 +141,57 @@ describe('/api/gemini', () => {
     });
   });
 
-  it('should include previous problems in prompt', async () => {
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => JSON.stringify(mockValidQuestion),
-      },
-    });
+  it('should handle OpenRouter API errors', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: async () => 'Unauthorized'
+    } as Response);
 
     const request = createRequest({
-      userLevel: 'Intermediate',
-      topic: 'Recursion',
-      previousProblems: ['Fibonacci', 'Factorial'],
+      userLevel: 'Beginner',
+      topic: 'Lists',
     });
 
-    await POST(request);
+    const response = await POST(request);
+    const data = await response.json();
 
-    expect(mockGenerateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Avoid creating problems similar to these previously solved ones: Fibonacci, Factorial')
-    );
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('AI service configuration error');
   });
 
-  it('should handle invalid JSON response from Gemini', async () => {
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => 'This is not valid JSON',
-      },
+  it('should handle rate limiting errors', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 429,
+      text: async () => 'Rate limit exceeded'
+    } as Response);
+
+    const request = createRequest({
+      userLevel: 'Beginner',
+      topic: 'Lists',
     });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(data.error).toBe('AI service temporarily unavailable. Please try again later.');
+  });
+
+  it('should handle invalid JSON responses', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: 'This is not valid JSON'
+            }
+          }
+        ]
+      })
+    } as Response);
 
     const request = createRequest({
       userLevel: 'Beginner',
@@ -183,30 +203,6 @@ describe('/api/gemini', () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe('Failed to parse AI response');
-  });
-
-  it('should handle incomplete question structure', async () => {
-    const incompleteQuestion = {
-      title: 'Test Problem',
-      // Missing required fields
-    };
-
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => JSON.stringify(incompleteQuestion),
-      },
-    });
-
-    const request = createRequest({
-      userLevel: 'Beginner',
-      topic: 'Lists',
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(500);
-    expect(data.error).toBe('Invalid question structure generated');
   });
 
   it('should ensure both public and hidden test cases exist', async () => {
@@ -226,11 +222,18 @@ describe('/api/gemini', () => {
       ]
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => JSON.stringify(questionWithOnlyPublic),
-      },
-    });
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify(questionWithOnlyPublic)
+            }
+          }
+        ]
+      })
+    } as Response);
 
     const request = createRequest({
       userLevel: 'Beginner',
@@ -244,42 +247,27 @@ describe('/api/gemini', () => {
     expect(data.question.testCases.some((tc: any) => tc.isHidden)).toBe(true);
   });
 
-  it('should handle Gemini API errors', async () => {
-    mockGenerateContent.mockRejectedValue(new Error('API key invalid'));
+  it('should include previous problems in prompt', async () => {
+    mockSuccessfulOpenRouterResponse();
 
     const request = createRequest({
       userLevel: 'Beginner',
       topic: 'Lists',
+      previousProblems: ['Two Sum', 'Valid Parentheses']
     });
 
-    const response = await POST(request);
-    const data = await response.json();
+    await POST(request);
 
-    expect(response.status).toBe(500);
-    expect(data.error).toBe('AI service configuration error');
-  });
-
-  it('should handle rate limiting errors', async () => {
-    mockGenerateContent.mockRejectedValue(new Error('quota exceeded'));
-
-    const request = createRequest({
-      userLevel: 'Beginner',
-      topic: 'Lists',
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(429);
-    expect(data.error).toBe('AI service temporarily unavailable. Please try again later.');
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://openrouter.ai/api/v1/chat/completions',
+      expect.objectContaining({
+        body: expect.stringContaining('Two Sum, Valid Parentheses')
+      })
+    );
   });
 
   it('should use appropriate prompts for different levels and topics', async () => {
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => JSON.stringify(mockValidQuestion),
-      },
-    });
+    mockSuccessfulOpenRouterResponse();
 
     // Test Advanced level with Dynamic Programming
     const request = createRequest({
@@ -289,8 +277,11 @@ describe('/api/gemini', () => {
 
     await POST(request);
 
-    expect(mockGenerateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Design a DP problem with optimal substructure and overlapping subproblems')
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://openrouter.ai/api/v1/chat/completions',
+      expect.objectContaining({
+        body: expect.stringContaining('Design a DP problem with optimal substructure and overlapping subproblems')
+      })
     );
   });
 
@@ -303,11 +294,18 @@ describe('/api/gemini', () => {
       This should be challenging but fair!
     `;
 
-    mockGenerateContent.mockResolvedValue({
-      response: {
-        text: () => responseWithExtraText,
-      },
-    });
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: responseWithExtraText
+            }
+          }
+        ]
+      })
+    } as Response);
 
     const request = createRequest({
       userLevel: 'Beginner',

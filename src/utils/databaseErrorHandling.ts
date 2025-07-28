@@ -121,7 +121,7 @@ export async function withDatabaseErrorHandling<T>(
     return { success: true, data };
   } catch (error) {
     const appError = error instanceof AppError ? error : new AppError(
-      error.message || 'Unknown database error',
+      error instanceof Error ? error.message : 'Unknown database error',
       ErrorCodes.DATABASE_ERROR,
       500
     );
@@ -145,11 +145,11 @@ export async function withTransactionErrorHandling<T>(
     return { success: true, data: result };
   } catch (error) {
     logError(error as Error, { ...context, operation: 'transaction' });
-    
-    if (error.code === 'aborted') {
+
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'aborted') {
       throw new DatabaseTransactionError('Transaction was aborted due to conflicts');
     }
-    
+
     handleDatabaseError(error, context);
   }
 }
@@ -177,7 +177,7 @@ export async function withBatchErrorHandling<T, R>(
       results.push(result);
     } catch (error) {
       const appError = error instanceof AppError ? error : new AppError(
-        error.message || 'Batch operation failed',
+        error instanceof Error ? error.message : 'Batch operation failed',
         ErrorCodes.DATABASE_ERROR,
         500
       );
@@ -276,7 +276,7 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
     await new Promise(resolve => setTimeout(resolve, 10));
   } catch (error) {
     isHealthy = false;
-    errors.push(error.message || 'Database health check failed');
+    errors.push(error instanceof Error ? error.message : 'Database health check failed');
   }
 
   const latency = Date.now() - startTime;

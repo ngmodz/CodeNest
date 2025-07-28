@@ -126,10 +126,10 @@ if (!(language in LANGUAGE_MAP)) {
 const rateLimitCheck = rateLimit(50, 15 * 60 * 1000)(request);
 ```
 
-### 2. `/api/gemini` - AI Service Security
+### 2. `/api/generateQuestion` - AI Service Security
 
 #### API Key Protection
-- **Environment Variables**: Gemini API key stored securely
+- **Environment Variables**: OpenRouter API key stored securely
 - **Request Validation**: User level and topic validated before AI calls
 - **Response Sanitization**: AI responses validated and sanitized
 
@@ -178,7 +178,7 @@ FIREBASE_PRIVATE_KEY=your-private-key
 JUDGE0_API_KEY=your-rapidapi-key
 JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
 JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
-GEMINI_API_KEY=your-gemini-api-key
+OPENROUTER_API_KEY=your-openrouter-api-key
 
 # Client-side Firebase Config
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key

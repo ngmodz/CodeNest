@@ -51,8 +51,12 @@ export function useProfile(): UseProfileReturn {
     setError(null);
 
     try {
-      const userProfile = await userService.getProfile(user.uid);
-      setProfile(userProfile);
+      const result = await userService.getProfile(user.uid);
+      if (result.success && result.data) {
+        setProfile(result.data);
+      } else {
+        setError(result.error?.message || 'Failed to load profile');
+      }
     } catch (err) {
       console.error('Error loading profile:', err);
       setError('Failed to load profile');

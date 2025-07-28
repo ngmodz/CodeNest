@@ -8,7 +8,7 @@ import {
 } from '@/types';
 
 // HTML sanitization utilities
-export class HtmlSanitizer {
+class HtmlSanitizer {
   private static readonly ALLOWED_TAGS = ['b', 'i', 'u', 'strong', 'em', 'code', 'pre', 'br', 'p'];
   private static readonly DANGEROUS_PATTERNS = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
@@ -49,7 +49,7 @@ export class HtmlSanitizer {
 }
 
 // SQL injection prevention utilities
-export class SqlSanitizer {
+class SqlSanitizer {
   private static readonly SQL_INJECTION_PATTERNS = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/gi,
     /(\b(OR|AND)\s+\d+\s*=\s*\d+)/gi,
@@ -77,7 +77,7 @@ export class SqlSanitizer {
 }
 
 // XSS prevention utilities
-export class XssSanitizer {
+class XssSanitizer {
   private static readonly XSS_PATTERNS = [
     /<script[^>]*>.*?<\/script>/gi,
     /<iframe[^>]*>.*?<\/iframe>/gi,
@@ -132,7 +132,7 @@ export class XssSanitizer {
 }
 
 // Code sanitization utilities
-export class CodeSanitizer {
+class CodeSanitizer {
   private static readonly DANGEROUS_CODE_PATTERNS = [
     // System commands
     /\b(system|exec|eval|subprocess|os\.system|os\.popen|os\.spawn)/gi,
@@ -280,7 +280,7 @@ export class CodeSanitizer {
 }
 
 // Input sanitization for different data types
-export class InputSanitizer {
+class InputSanitizer {
   static sanitizeUserInput(input: unknown, type: 'string' | 'number' | 'boolean' | 'array' | 'object'): any {
     switch (type) {
       case 'string':
@@ -348,14 +348,12 @@ export class InputSanitizer {
 
   private static sanitizeArrayInput(input: unknown): any[] | null {
     if (!Array.isArray(input)) return null;
-    
+
     // Limit array length
-    if (input.length > 1000) {
-      input = input.slice(0, 1000);
-    }
-    
+    const arrayInput = input.length > 1000 ? input.slice(0, 1000) : input;
+
     // Recursively sanitize array elements
-    return input.map(item => {
+    return arrayInput.map(item => {
       if (typeof item === 'string') return this.sanitizeStringInput(item);
       if (typeof item === 'number') return this.sanitizeNumberInput(item);
       if (typeof item === 'boolean') return this.sanitizeBooleanInput(item);
@@ -416,7 +414,7 @@ export class InputSanitizer {
 }
 
 // Comprehensive data sanitization for specific domain objects
-export class DomainSanitizer {
+class DomainSanitizer {
   static sanitizeUserProfile(profile: any): any {
     const sanitized: any = {};
     
@@ -487,8 +485,8 @@ export class DomainSanitizer {
     
     if (Array.isArray(question.examples)) {
       sanitized.examples = question.examples
-        .filter(ex => ex.input && ex.output)
-        .map(ex => ({
+        .filter((ex: any) => ex.input && ex.output)
+        .map((ex: any) => ({
           input: HtmlSanitizer.stripAllHtml(ValidationUtils.sanitizeString(ex.input) || ''),
           output: HtmlSanitizer.stripAllHtml(ValidationUtils.sanitizeString(ex.output) || ''),
           explanation: ex.explanation ? HtmlSanitizer.sanitizeHtml(ValidationUtils.sanitizeString(ex.explanation) || '') : undefined
@@ -497,17 +495,17 @@ export class DomainSanitizer {
     
     if (Array.isArray(question.constraints)) {
       sanitized.constraints = question.constraints
-        .map(constraint => {
+        .map((constraint: any) => {
           const sanitizedConstraint = ValidationUtils.sanitizeString(constraint, { minLength: 1 });
           return sanitizedConstraint ? HtmlSanitizer.stripAllHtml(sanitizedConstraint) : null;
         })
-        .filter(constraint => constraint !== null && constraint.length > 0);
+        .filter((constraint: any) => constraint !== null && constraint.length > 0);
     }
     
     if (Array.isArray(question.testCases)) {
       sanitized.testCases = question.testCases
-        .filter(tc => tc.input && tc.expectedOutput)
-        .map(tc => ({
+        .filter((tc: any) => tc.input && tc.expectedOutput)
+        .map((tc: any) => ({
           input: ValidationUtils.sanitizeString(tc.input) || '',
           expectedOutput: ValidationUtils.sanitizeString(tc.expectedOutput) || '',
           isHidden: Boolean(tc.isHidden)
@@ -566,7 +564,7 @@ export class DomainSanitizer {
     if (memoryUsage !== null) sanitized.memoryUsage = memoryUsage;
     
     if (Array.isArray(submission.testResults)) {
-      sanitized.testResults = submission.testResults.map(result => ({
+      sanitized.testResults = submission.testResults.map((result: any) => ({
         passed: Boolean(result.passed),
         input: result.input !== null && result.input !== undefined ? String(result.input) : '',
         expectedOutput: result.expectedOutput !== null && result.expectedOutput !== undefined ? String(result.expectedOutput) : '',

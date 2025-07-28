@@ -104,7 +104,7 @@ export const POST = withAuth(handleFunction);
 - **Current Usage**: 3/12 API routes (25% utilization)
 - **Routes**:
   1. `/api/compile` - Code compilation and execution
-  2. `/api/gemini` - AI question generation
+  2. `/api/generateQuestion` - AI question generation using OpenRouter
   3. `/api/streak` - Streak and XP management
 - **Optimization**: Well under the limit with room for 9 additional routes
 
@@ -236,7 +236,7 @@ FIREBASE_PRIVATE_KEY=your-private-key
 JUDGE0_API_KEY=your-rapidapi-key
 JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
 JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
-GEMINI_API_KEY=your-gemini-api-key
+OPENROUTER_API_KEY=your-openrouter-api-key
 
 # Client-side Firebase Config
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
