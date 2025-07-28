@@ -81,7 +81,7 @@
     - Write tests for validation and error scenarios
     - _Requirements: 7.1, 7.5_
 
-- [-] 5. Build adaptive dashboard system
+- [x] 5. Build adaptive dashboard system
 
 
 
@@ -91,7 +91,10 @@
 
 
 
-  - [-] 5.1 Create dashboard layout and navigation
+
+
+  - [x] 5.1 Create dashboard layout and navigation
+
 
     - Build responsive dashboard layout with sidebar navigation
     - Implement theme toggle functionality with persistence
@@ -100,7 +103,9 @@
     - Write tests for dashboard layout components
     - _Requirements: 2.4, 8.1, 8.2, 8.4_
 
-  - [ ] 5.2 Implement personalized content sections
+  - [x] 5.2 Implement personalized content sections
+
+
     - Create daily challenge display component
     - Build topic filtering system based on user skill level
     - Implement difficulty-based problem filtering
@@ -108,30 +113,69 @@
     - Write tests for content personalization logic
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 6. Implement Firebase Cloud Functions for external integrations
-  - [ ] 6.1 Set up Judge0 API integration function
-    - Create Firebase Function for code evaluation using Judge0 API
-    - Implement language mapping and submission handling
-    - Add error handling and retry logic for API failures
+- [-] 6. Implement Next.js API Routes for backend integrations
+
+
+
+  - [x] 6.1 Set up `/api/compile` endpoint for Judge0 integration
+
+
+    - Create API route to handle code compilation and execution via Judge0
+    - Accept POST requests with code, language ID, and test cases
+    - Implement action-based logic: "run" for sample tests, "submit" for hidden tests
+    - Map supported languages (Python=71, Java=62, JavaScript=63, C++=54, C=50)
+    - Add timeout handling, retries, and comprehensive error messages
+    - Integrate Firebase Auth verification using Admin SDK
     - Create test cases for code evaluation scenarios
     - _Requirements: 5.1, 5.2, 7.3_
 
-  - [ ] 6.2 Build Google Gemini AI integration function
-    - Create Firebase Function for AI question generation using Gemini API
-    - Implement context-aware prompt generation based on user data
-    - Add question validation and formatting logic
-    - Create test cases for AI question generation
+  - [x] 6.2 Build `/api/gemini` endpoint for AI question generation
+
+
+
+    - Create API route for Google Gemini AI integration
+    - Accept POST requests with user level and selected topic
+    - Generate dynamic prompts based on user's current skill level
+    - Return formatted coding questions with title, description, constraints
+    - Include input/output format, sample and hidden test cases
+    - Validate AI response structure before returning to frontend
+    - Implement Firebase Auth verification for secure access
+    - Create test cases for AI question generation workflows
     - _Requirements: 3.1, 3.2, 7.2_
 
-  - [ ] 6.3 Create streak management function
-    - Implement Firebase Function for daily streak calculation
-    - Add time-based validation and streak reset logic
-    - Create XP calculation and update mechanisms
-    - Write tests for streak management scenarios
+  - [x] 6.3 Create `/api/streak` endpoint for XP and streak management
+
+
+    - Implement API route for daily streak calculation and XP management
+    - Accept authenticated POST requests from frontend
+    - Retrieve user's last activity date from Firestore
+    - Update streak count: increment if continuous, reset if day skipped
+    - Calculate and update XP rewards based on activity
+    - Return new streak count and XP totals to frontend
+    - Integrate Firebase Auth verification using ID token
+    - Write tests for streak management and XP calculation scenarios
     - _Requirements: 6.1, 6.2, 6.5, 7.4_
 
-- [ ] 7. Build coding interface with Monaco Editor
-  - [ ] 7.1 Set up Monaco Editor integration
+  - [ ] 6.4 Set up API security and folder structure
+
+
+
+
+
+
+
+    - Create `/pages/api/` folder structure for Vercel deployment
+    - Implement Firebase Admin SDK initialization for server-side auth
+    - Add ID token verification middleware for all protected endpoints
+    - Create error handling utilities for API responses
+    - Implement request validation and sanitization
+    - Add rate limiting and security headers
+    - Optimize for Vercel Free Plan (keep under 12 API routes total)
+    - Document API endpoints and authentication flow
+    - _Requirements: 7.1, 7.5_
+
+- [-] 7. Build coding interface with Monaco Editor
+  - [x] 7.1 Set up Monaco Editor integration
     - Install and configure Monaco Editor for Next.js
     - Create code editor component with language support
     - Implement syntax highlighting for Python, JavaScript, Java, C++, C
@@ -139,7 +183,7 @@
     - Write tests for editor functionality
     - _Requirements: 4.2, 4.3, 8.2_
 
-  - [ ] 7.2 Create split-view problem interface
+  - [x] 7.2 Create split-view problem interface
     - Build left panel for problem description, examples, and constraints
     - Implement right panel with Monaco Editor and controls
     - Create responsive layout that works on mobile devices
@@ -147,7 +191,7 @@
     - Write tests for split-view layout and interactions
     - _Requirements: 4.1, 4.2, 8.4_
 
-  - [ ] 7.3 Implement code execution and results display
+  - [x] 7.3 Implement code execution and results display
     - Create output panel for test results and execution feedback
     - Implement real-time code execution via Firebase Functions
     - Add result visualization with success/failure indicators
