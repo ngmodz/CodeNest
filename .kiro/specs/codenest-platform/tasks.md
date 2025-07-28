@@ -199,8 +199,8 @@
     - Write tests for code execution flow
     - _Requirements: 4.4, 4.5, 5.3, 5.4_
 
-- [ ] 8. Build test case system and submission handling
-  - [ ] 8.1 Create test case management
+- [x] 8. Build test case system and submission handling
+  - [x] 8.1 Create test case management
     - Implement test case display for public examples
     - Create hidden test case handling for submissions
     - Add test result comparison and validation logic
@@ -208,7 +208,7 @@
     - Write tests for test case management
     - _Requirements: 5.1, 5.2, 5.3_
 
-  - [ ] 8.2 Implement submission evaluation system
+  - [x] 8.2 Implement submission evaluation system
     - Create submission processing workflow
     - Implement verdict determination logic (Accepted, Wrong Answer, etc.)
     - Add execution time and memory usage tracking

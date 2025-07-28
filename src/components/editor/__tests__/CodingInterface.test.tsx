@@ -14,6 +14,7 @@ jest.mock('../CodeEditor', () => {
           data-testid="editor-textarea" 
           value={code} 
           onChange={(e) => onChange && onChange(e.target.value)}
+          readOnly={!onChange}
           aria-label="Code editor"
         />
       </div>

@@ -19,17 +19,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
-    setSidebarOpen(false);
-  }, []);
+    if (!isDesktop) {
+      setSidebarOpen(false);
+    }
+  }, [isDesktop]);
 
   // Handle responsive sidebar
   useEffect(() => {
     const handleResize = () => {
-      const desktop = window.innerWidth >= 1024;
-      setIsDesktop(desktop);
-      if (desktop) {
-        setSidebarOpen(false);
-      }
+      setIsDesktop(window.innerWidth >= 1024);
     };
 
     // Set initial state
@@ -68,7 +66,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen || isDesktop} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content */}
       <div className="lg:pl-64">
@@ -77,7 +75,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between">
             {/* Mobile menu button */}
             <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

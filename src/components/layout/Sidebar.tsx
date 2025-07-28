@@ -79,7 +79,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     open: {
       x: 0,
       transition: {
-        type: 'spring',
+        type: "spring" as const,
         stiffness: 300,
         damping: 30,
       },
@@ -87,7 +87,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     closed: {
       x: '-100%',
       transition: {
-        type: 'spring',
+        type: "spring" as const,
         stiffness: 300,
         damping: 30,
       },
@@ -108,11 +108,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     }
   };
 
+  // Determine if we're on desktop based on CSS media query
+  const isDesktop = typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : false;
+
   return (
     <>
       {/* Mobile overlay */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && !isDesktop && (
           <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
             variants={overlayVariants}
@@ -128,8 +131,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <motion.aside
         className="fixed top-0 left-0 z-50 w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 lg:translate-x-0"
         variants={sidebarVariants}
-        initial="closed"
-        animate={isOpen ? 'open' : 'closed'}
+        initial={isDesktop ? "open" : "closed"}
+        animate={isOpen ? 'open' : (isDesktop ? 'open' : 'closed')}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -143,7 +146,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             
             {/* Close button for mobile */}
             <button
+              type="button"
               onClick={onClose}
+              aria-label="Close menu"
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +220,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
             
             <button
+              type="button"
               onClick={handleSignOut}
+              aria-label="Sign out"
               className="w-full flex items-center space-x-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -16,6 +16,7 @@ jest.mock('@monaco-editor/react', () => {
           data-testid="editor-textarea" 
           value={value} 
           onChange={(e) => onChange && onChange(e.target.value)}
+          readOnly={!onChange}
           aria-label="Code editor"
         />
       </div>

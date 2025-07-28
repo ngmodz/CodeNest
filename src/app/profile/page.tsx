@@ -4,10 +4,40 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { useState, useEffect } from 'react';
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const { profile } = useProfile();
+  const { profile, updateProfile } = useProfile();
+  const [displayName, setDisplayName] = useState('');
+  const [skillLevel, setSkillLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced'>('Intermediate');
+  const [preferredLanguage, setPreferredLanguage] = useState<'JavaScript' | 'Python' | 'Java' | 'C++' | 'C'>('JavaScript');
+  
+  // Initialize form with user data when it loads
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || '');
+    }
+    
+    if (profile) {
+      setSkillLevel(profile.level);
+      setPreferredLanguage(profile.preferredLanguage);
+    }
+  }, [user, profile]);
+
+  const handleSaveChanges = async () => {
+    try {
+      // Update profile logic would go here
+      await updateProfile({
+        level: skillLevel,
+        preferredLanguage: preferredLanguage
+      });
+      // Could add a success notification here
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      // Could add an error notification here
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -31,24 +61,28 @@ export default function ProfilePage() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="email-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email
                   </label>
                   <input
+                    id="email-input"
                     type="email"
                     value={user?.email || ''}
                     disabled
+                    readOnly
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="display-name-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Display Name
                   </label>
                   <input
+                    id="display-name-input"
                     type="text"
-                    value={user?.displayName || ''}
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="Enter your display name"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -63,32 +97,36 @@ export default function ProfilePage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="skill-level" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Skill Level
                   </label>
                   <select 
+                    id="skill-level"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    defaultValue={profile?.level || 'Intermediate'}
+                    value={skillLevel}
+                    onChange={(e) => setSkillLevel(e.target.value as 'Beginner' | 'Intermediate' | 'Advanced')}
                   >
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
+                    <option key="Beginner" value="Beginner">Beginner</option>
+                    <option key="Intermediate" value="Intermediate">Intermediate</option>
+                    <option key="Advanced" value="Advanced">Advanced</option>
                   </select>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="preferred-language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Preferred Language
                   </label>
                   <select 
+                    id="preferred-language"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    defaultValue={profile?.preferredLanguage || 'JavaScript'}
+                    value={preferredLanguage}
+                    onChange={(e) => setPreferredLanguage(e.target.value as 'JavaScript' | 'Python' | 'Java' | 'C++' | 'C')}
                   >
-                    <option value="JavaScript">JavaScript</option>
-                    <option value="Python">Python</option>
-                    <option value="Java">Java</option>
-                    <option value="C++">C++</option>
-                    <option value="C">C</option>
+                    <option key="JavaScript" value="JavaScript">JavaScript</option>
+                    <option key="Python" value="Python">Python</option>
+                    <option key="Java" value="Java">Java</option>
+                    <option key="C++" value="C++">C++</option>
+                    <option key="C" value="C">C</option>
                   </select>
                 </div>
               </div>
@@ -113,7 +151,10 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex space-x-4">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+              <button 
+                onClick={handleSaveChanges}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              >
                 Save Changes
               </button>
               <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors">
@@ -128,7 +169,7 @@ export default function ProfilePage() {
               <div className="text-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-white font-bold text-2xl">
-                    {user?.displayName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+                    {user?.displayName?.[0] || (user?.email && user.email[0].toUpperCase()) || 'U'}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
